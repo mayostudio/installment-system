@@ -137,7 +137,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
 
     try {
-      final res = await http.get(Uri.parse('https://icy-dingos-design.loca.lt/dashboard/stats/')).timeout(const Duration(seconds: 5));
+      final res = await http.get(Uri.parse('https://installment-system-production.up.railway.app/dashboard/stats/')).timeout(const Duration(seconds: 5));
       if (res.statusCode == 200) {
         setState(() {
           _stats = jsonDecode(utf8.decode(res.bodyBytes));
@@ -546,7 +546,7 @@ class _ContractCalculatorScreenState extends State<ContractCalculatorScreen> {
 
   Future<void> _fetchExistingCustomers() async {
     try {
-      final res = await http.get(Uri.parse('https://icy-dingos-design.loca.lt/customers/'));
+      final res = await http.get(Uri.parse('https://installment-system-production.up.railway.app/customers/'));
       if (res.statusCode == 200) {
         final data = jsonDecode(utf8.decode(res.bodyBytes));
         setState(() {
@@ -610,7 +610,7 @@ class _ContractCalculatorScreenState extends State<ContractCalculatorScreen> {
         });
 
         final custRes = await http.post(
-          Uri.parse('https://icy-dingos-design.loca.lt/customers/'),
+          Uri.parse('https://installment-system-production.up.railway.app/customers/'),
           headers: {"Content-Type": "application/json", "bypass-tunnel-reminder": "true"},
           body: customerBody,
         ).timeout(const Duration(seconds: 5));
@@ -639,7 +639,7 @@ class _ContractCalculatorScreenState extends State<ContractCalculatorScreen> {
       });
 
       final contractRes = await http.post(
-        Uri.parse('https://icy-dingos-design.loca.lt/contracts/'),
+        Uri.parse('https://installment-system-production.up.railway.app/contracts/'),
         headers: {
   "Content-Type": "application/json",
   "bypass-tunnel-reminder": "true",
@@ -1004,7 +1004,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
     try {
       final response = await http
     .get(
-      Uri.parse('https://icy-dingos-design.loca.lt/customers/'),
+      Uri.parse('https://installment-system-production.up.railway.app/customers/'),
       headers: {
         "bypass-tunnel-reminder": "true",
       },
@@ -1063,7 +1063,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
     if (confirm != true) return;
 
     try {
-      final res = await http.delete(Uri.parse('https://icy-dingos-design.loca.lt/customers/$customerId/'));
+      final res = await http.delete(Uri.parse('https://installment-system-production.up.railway.app/customers/$customerId/'));
       if (res.statusCode == 200) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1348,7 +1348,7 @@ class _CustomerMonthlyScheduleScreenState extends State<CustomerMonthlyScheduleS
   Future<void> _payFullMonth(int monthIndex, List<dynamic> scheduleIds) async {
     try {
       final res = await http.post(
-        Uri.parse('https://icy-dingos-design.loca.lt/installments/pay-month/'),
+        Uri.parse('https://installment-system-production.up.railway.app/installments/pay-month/'),
         headers: {"Content-Type": "application/json", "bypass-tunnel-reminder": "true"},
         body: jsonEncode({"schedule_ids": scheduleIds}),
       );
@@ -1638,7 +1638,7 @@ class _CustomerProductsScreenState extends State<CustomerProductsScreen> {
     if (confirm != true) return;
 
     try {
-      final res = await http.delete(Uri.parse('https://icy-dingos-design.loca.lt/contracts/$contractId/'));
+      final res = await http.delete(Uri.parse('https://installment-system-production.up.railway.app/contracts/$contractId/'));
       if (res.statusCode == 200) {
         setState(() {
           _contracts.removeWhere((c) => c['id'] == contractId);
@@ -1955,7 +1955,7 @@ class _EditContractScreenState extends State<EditContractScreen> {
       });
 
       final res = await http.put(
-        Uri.parse('https://icy-dingos-design.loca.lt/contracts/$contractId/'),
+        Uri.parse('https://installment-system-production.up.railway.app/contracts/$contractId/'),
         headers: {"Content-Type": "application/json", "bypass-tunnel-reminder": "true"},
         body: body,
       );
