@@ -9,25 +9,37 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - uses: subosito/flutter-action@v2
+      - name: Setup Flutter Stable
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
           cache: true
 
-      - name: Configure and Build APK
+      - name: Regenerate Clean Android Project & Build APK
         run: |
+          # 1. إزالة مجلد الأندرويد القديم بالكامل لضمان التخلص من أي ملفات معطوبة
+          rm -rf android/
+          
+          # 2. إنشاء بيئة أندرويد قياسية رسمية ومتوافقة مع أحدث Gradle و Kotlin
+          flutter create . --platforms=android --org=com.mayostudio
+          
+          # 3. قبول التراخيص وجلب الحزم
           yes | flutter doctor --android-licenses || true
           flutter pub get
-          flutter build apk --release --no-tree-shake-icons
+          
+          # 4. بناء الـ APK للـ Release مباشرة
+          flutter build apk --release
 
-      - name: Upload APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: installment-app-release
