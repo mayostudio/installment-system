@@ -29,28 +29,33 @@ jobs:
           rm -rf android/
           flutter create . --platforms=android --org=com.mayostudio
           
-          # إضافة صلاحية الإنترنت والشبكة لملف AndroidManifest.xml
+          # إضافة صلاحيات الإنترنت إلى AndroidManifest.xml
           python3 -c "
           path = 'android/app/src/main/AndroidManifest.xml'
           with open(path, 'r') as f:
               data = f.read()
-          permissions = '''
+          perms = '''
               <uses-permission android:name=\"android.permission.INTERNET\"/>
               <uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>
           '''
-          data = data.replace('<application', permissions + '\n    <application')
+          data = data.replace('<application', perms + '\n    <application')
           with open(path, 'w') as f:
               f.write(data)
           "
 
-          # ضبط التوقيع التلقائي لنسخة الـ release
+          # تطبيق توقيع debug على نسخة release تلقائياً مع دعم build.gradle و build.gradle.kts
           python3 -c "
-          path = 'android/app/build.gradle'
-          with open(path, 'r') as f:
+          import os
+          gradle_file = 'android/app/build.gradle.kts' if os.path.exists('android/app/build.gradle.kts') else 'android/app/build.gradle'
+          with open(gradle_file, 'r') as f:
               content = f.read()
-          if 'signingConfig signingConfigs.debug' not in content:
-              content = content.replace('buildTypes {', 'buildTypes {\n        release {\n            signingConfig signingConfigs.debug\n        }')
-          with open(path, 'w') as f:
+          if 'build.gradle.kts' in gradle_file:
+              if 'signingConfig = signingConfigs.getByName(\"debug\")' not in content:
+                  content = content.replace('buildTypes {', 'buildTypes {\n        getByName(\"release\") {\n            signingConfig = signingConfigs.getByName(\"debug\")\n        }')
+          else:
+              if 'signingConfig signingConfigs.debug' not in content:
+                  content = content.replace('buildTypes {', 'buildTypes {\n        release {\n            signingConfig signingConfigs.debug\n        }')
+          with open(gradle_file, 'w') as f:
               f.write(content)
           "
 
