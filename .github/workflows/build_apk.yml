@@ -24,19 +24,37 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Regenerate Clean Android Project & Build APK
+      - name: Regenerate Android, Add Permissions & Sign APK
         run: |
-          # 1. إزالة مجلد الأندرويد القديم بالكامل لضمان التخلص من أي ملفات معطوبة
           rm -rf android/
-          
-          # 2. إنشاء بيئة أندرويد قياسية رسمية ومتوافقة مع أحدث Gradle و Kotlin
           flutter create . --platforms=android --org=com.mayostudio
           
-          # 3. قبول التراخيص وجلب الحزم
-          yes | flutter doctor --android-licenses || true
+          # إضافة صلاحية الإنترنت والشبكة لملف AndroidManifest.xml
+          python3 -c "
+          path = 'android/app/src/main/AndroidManifest.xml'
+          with open(path, 'r') as f:
+              data = f.read()
+          permissions = '''
+              <uses-permission android:name=\"android.permission.INTERNET\"/>
+              <uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>
+          '''
+          data = data.replace('<application', permissions + '\n    <application')
+          with open(path, 'w') as f:
+              f.write(data)
+          "
+
+          # ضبط التوقيع التلقائي لنسخة الـ release
+          python3 -c "
+          path = 'android/app/build.gradle'
+          with open(path, 'r') as f:
+              content = f.read()
+          if 'signingConfig signingConfigs.debug' not in content:
+              content = content.replace('buildTypes {', 'buildTypes {\n        release {\n            signingConfig signingConfigs.debug\n        }')
+          with open(path, 'w') as f:
+              f.write(content)
+          "
+
           flutter pub get
-          
-          # 4. بناء الـ APK للـ Release مباشرة
           flutter build apk --release
 
       - name: Upload APK Artifact
